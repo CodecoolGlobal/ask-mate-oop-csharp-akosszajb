@@ -63,4 +63,22 @@ public class QuestionRepository
 
         return null;
     }
+    
+    public int Create(Question question)
+    {
+        _connection.Open();
+        var adatpter = new NpgsqlDataAdapter("INSERT INTO questions (title, description, submission_time)" +
+                                             "VALUES (:title, :description, :submission_time) RETURNING id", _connection);
+
+        adatpter.SelectCommand?.Parameters.AddWithValue(":title", question.Title);
+        adatpter.SelectCommand?.Parameters.AddWithValue(":description", question.Description);
+        adatpter.SelectCommand?.Parameters.AddWithValue(":submission_time", question.Submission_time);
+
+        var lastInsertId = (int)adatpter.SelectCommand?.ExecuteScalar();
+        _connection.Close();
+
+        return lastInsertId;
+    }
+    
+  
 }

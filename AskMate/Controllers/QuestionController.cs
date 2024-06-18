@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using System.IO;
+using AskMate.Model;
 using AskMate.Model.Repositories;
 using Npgsql;
 
@@ -32,6 +33,13 @@ namespace AskMate.Controllers
             var repository = new QuestionRepository(new NpgsqlConnection(_connectionString));
 
             return Ok(repository.GetById(id));
+        }
+        
+        [HttpPost()]
+        public IActionResult Create(Question question)
+        {
+            var repository = new QuestionRepository(new NpgsqlConnection(_connectionString));
+            return Ok(repository.Create(question));
         }
     }
     
