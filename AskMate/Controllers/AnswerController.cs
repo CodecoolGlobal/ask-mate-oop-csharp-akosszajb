@@ -1,7 +1,4 @@
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.IO;
 using AskMate.Model;
 using AskMate.Model.Repositories;
 using Npgsql;
