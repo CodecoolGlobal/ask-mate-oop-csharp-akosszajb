@@ -41,6 +41,14 @@ namespace AskMate.Controllers
             var repository = new QuestionRepository(new NpgsqlConnection(_connectionString));
             return Ok(repository.Create(question));
         }
+        
+        [HttpDelete("{id}")]
+        public IActionResult Delete(int id)
+        {
+            var repository = new QuestionRepository(new NpgsqlConnection(_connectionString));
+            repository.Delete(id);
+            return Ok();
+        }
     }
     
 }
