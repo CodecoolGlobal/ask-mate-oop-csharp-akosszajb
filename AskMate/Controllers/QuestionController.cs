@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using System.IO;
+using AskMate.Model.Repositories;
+using Npgsql;
 
 namespace AskMate.Controllers
 {
@@ -9,10 +11,10 @@ namespace AskMate.Controllers
     public class QuestionController : ControllerBase
     {
         private readonly string _connectionString;
-
         public QuestionController(IWebHostEnvironment env)
         {
-            string filePath = Path.Combine(env.ContentRootPath, "ConnectionString.txt");
+            string filePath = Path.Combine("Model", "ConnectionString.txt");
+                
 
             // Read the connection string from the file
             _connectionString = System.IO.File.ReadAllText(filePath).Trim();
@@ -21,7 +23,8 @@ namespace AskMate.Controllers
         [HttpGet]
         public IActionResult GetAll()
         {
-            return Ok("No questions were asked yet.");
+            var repository = new QuestionRepository(new NpgsqlConnection(_connectionString));
+            return Ok(repository.GetAll());
         }
     }
 }
