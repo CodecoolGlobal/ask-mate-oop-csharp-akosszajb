@@ -15,7 +15,6 @@ namespace AskMate.Controllers
         {
             string filePath = Path.Combine("Model", "ConnectionString.txt");
                 
-
             // Read the connection string from the file
             _connectionString = System.IO.File.ReadAllText(filePath).Trim();
         }
@@ -26,5 +25,14 @@ namespace AskMate.Controllers
             var repository = new QuestionRepository(new NpgsqlConnection(_connectionString));
             return Ok(repository.GetAll());
         }
+        
+        [HttpGet("{id}")]
+        public IActionResult GetById(int id)
+        {
+            var repository = new QuestionRepository(new NpgsqlConnection(_connectionString));
+
+            return Ok(repository.GetById(id));
+        }
     }
+    
 }
