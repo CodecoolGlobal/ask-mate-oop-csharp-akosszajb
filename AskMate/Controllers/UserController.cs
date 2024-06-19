@@ -25,4 +25,23 @@ public class UserController : ControllerBase
         var repository = new UserRepository(new NpgsqlConnection(_connectionString));
         return Ok(repository.Create(user));
     }
+    
+    [HttpPost("Login")]
+    public IActionResult Login([FromBody] LoginModel login)
+    {
+        var repository = new UserRepository(new NpgsqlConnection(_connectionString));
+        var user = repository.AuthenticateUser(login.UsernameOrEmail, login.Password);
+        if (user != null)
+        {
+            var token = Convert.ToBase64String(Guid.NewGuid().ToByteArray());  // This is a placeholder. In production, use a secure method.
+            // Store this token in a database or cache with an expiration time
+            HttpContext.Session.SetString("AuthToken", token);
+            return Ok(new { token = token, message = "Login successful!" });
+        }
+        else
+        {
+            return Unauthorized(new { message = "Username or password is incorrect" });
+        }
+    }
+
 }
