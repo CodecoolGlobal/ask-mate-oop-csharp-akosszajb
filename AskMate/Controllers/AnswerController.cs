@@ -21,13 +21,17 @@ namespace AskMate.Controllers
         [HttpPost]
         public IActionResult Create(Answer answer)
         {
+            if (!HttpContext.Session.TryGetValue("AuthToken", out byte[] authToken))
+            {
+                return Unauthorized("You must be logged in to post an answer.");
+            }
+
             if (answer == null)
             {
                 return BadRequest("Invalid answer data.");
             }
 
             var repository = new AnswerRepository(new NpgsqlConnection(_connectionString));
-
             try
             {
                 var newAnswerId = repository.Create(answer);
