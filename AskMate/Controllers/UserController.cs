@@ -42,6 +42,11 @@ public class UserController : ControllerBase
             return Unauthorized(new { message = "Username or password is incorrect" });
         }
     }
-
-
+    [HttpPost("Logout")]
+    public IActionResult Logout()
+    {
+        // Clear the session token (AuthToken)
+        HttpContext.Session.Remove("AuthToken");
+        return Ok(new { message = "Logout successful" });
+    }
 }
