@@ -33,9 +33,8 @@ public class UserController : ControllerBase
         var user = repository.AuthenticateUser(login.UsernameOrEmail, login.Password);
         if (user != null)
         {
-            var token = Convert.ToBase64String(Guid.NewGuid().ToByteArray());  // This is a placeholder. In production, use a secure method.
-            // Store this token in a database or cache with an expiration time
-            HttpContext.Session.SetString("AuthToken", token);
+            var token = Convert.ToBase64String(Guid.NewGuid().ToByteArray());  // Consider using a more secure method
+            HttpContext.Session.SetString("AuthToken", token);  // Ensure the session is configured to handle tokens correctly
             return Ok(new { token = token, message = "Login successful!" });
         }
         else
@@ -43,5 +42,6 @@ public class UserController : ControllerBase
             return Unauthorized(new { message = "Username or password is incorrect" });
         }
     }
+
 
 }

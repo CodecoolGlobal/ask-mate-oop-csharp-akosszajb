@@ -36,25 +36,14 @@ namespace AskMate.Controllers
         [HttpPost()]
         public IActionResult Create(Question question)
         {
-            var authHeader = HttpContext.Request.Headers["Authorization"].ToString();
-            if (string.IsNullOrEmpty(authHeader))
+            if (!HttpContext.Session.TryGetValue("AuthToken", out byte[] authToken))
             {
                 return Unauthorized("You must be logged in to post a question.");
-            }
-
-            const string expectedPrefix = "Bearer ";
-            var token = authHeader.StartsWith(expectedPrefix) ? authHeader.Substring(expectedPrefix.Length).Trim() : authHeader;
-
-            //Replace "ExpectedTokenValue" with the actual expected token value, or implement a method to validate it
-            if (token == null || token != "ExpectedTokenValue")
-            {
-                return Unauthorized("Invalid token.");
             }
 
             var repository = new QuestionRepository(new NpgsqlConnection(_connectionString));
             return Ok(repository.Create(question));
         }
-
         
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
