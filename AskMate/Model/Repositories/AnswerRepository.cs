@@ -18,17 +18,18 @@ namespace AskMate.Model.Repositories
             {
                 throw new InvalidOperationException("Database connection is not initialized.");
             }
-
+            
             _connection.Open();
             try
             {
-                using (var command = new NpgsqlCommand("SELECT COUNT(1) FROM questions WHERE id = (SELECT question_id FROM answer WHERE id = @answerId) AND questions.user_id = @userId", _connection))
+                // using (var command = new NpgsqlCommand("SELECT COUNT(1) FROM questions WHERE id = (SELECT question_id FROM answer WHERE id = :answerId) AND questions.user_id = :userId", _connection))
+                using (var command = new NpgsqlCommand("SELECT COUNT(1) FROM questions WHERE id = (SELECT question_id FROM answer WHERE id = :answerId) AND questions.user_id = :userId", _connection))
                 {
-                    command.Parameters.AddWithValue("@answerId", answerId);
-                    command.Parameters.AddWithValue("@userId", userId);
+                    command.Parameters.AddWithValue(":answerId", answerId);
+                    command.Parameters.AddWithValue(":userId", userId);
                     var result = command.ExecuteScalar();
-                    Console.WriteLine(result.GetType());
-                    bool canAccept = (long)result == 1;
+                    Console.WriteLine(result); // 0
+                    bool canAccept = result != null;
                     return canAccept;
                 }
             }

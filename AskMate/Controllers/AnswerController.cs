@@ -19,20 +19,22 @@ namespace AskMate.Controllers
         }
         
         [HttpPatch("Accept/{id}")]
-        public IActionResult Accept(int id)
+        public IActionResult Accept(int id, Answer answer)
         {
             if (!HttpContext.Session.TryGetValue("AuthToken", out byte[] authToken))
             {
                 return Unauthorized("You must be logged in to accept an answer.");
             }
 
-            int userId = HttpContext.Session.GetInt32("userId").GetValueOrDefault();
+            // int userId = HttpContext.Session.GetInt32("userId").GetValueOrDefault(); // ez itt nem jó 
+            int userId = answer.User_id;
+            Console.Write(userId); // 00!!!!
             
             var repository = new AnswerRepository(new NpgsqlConnection(_connectionString));
             try
             {
                 // Ensure the logged-in user is the one who asked the question
-                if (!repository.CanAcceptAnswer(id, userId))
+                if (!repository.CanAcceptAnswer(id, userId))  // itt nem jó értékek kerülnek be
                 {
                     return BadRequest("You can only accept an answer to your own question.");
                 }
