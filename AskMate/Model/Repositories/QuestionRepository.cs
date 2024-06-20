@@ -31,7 +31,8 @@ public class QuestionRepository
                 Id = (int)row["id"],
                 Title = (string)row["title"],
                 Description = (string)row["description"],
-                Submission_time = (DateTime)row["submission_time"]
+                Submission_time = (DateTime)row["submission_time"],
+                User_id = (int)row["user_id"]
             });
         }
         _connection.Close();
@@ -56,7 +57,8 @@ public class QuestionRepository
                 Id = (int)row["id"],
                 Title = (string)row["title"],
                 Description = (string)row["description"],
-                Submission_time = (DateTime)row["submission_time"]
+                Submission_time = (DateTime)row["submission_time"],
+                User_id = (int)row["user_id"]
             };
         }
         _connection.Close();
@@ -67,12 +69,14 @@ public class QuestionRepository
     public int Create(Question question)
     {
         _connection.Open();
-        var adatpter = new NpgsqlDataAdapter("INSERT INTO questions (title, description, submission_time)" +
-                                             "VALUES (:title, :description, :submission_time) RETURNING id", _connection);
+        var adatpter = new NpgsqlDataAdapter("INSERT INTO questions (title, description, submission_time, user_id)" +
+                                             "VALUES (:title, :description, :submission_time, :user_id) RETURNING id", _connection);
 
         adatpter.SelectCommand?.Parameters.AddWithValue(":title", question.Title);
         adatpter.SelectCommand?.Parameters.AddWithValue(":description", question.Description);
         adatpter.SelectCommand?.Parameters.AddWithValue(":submission_time", question.Submission_time);
+        adatpter.SelectCommand?.Parameters.AddWithValue(":user_id", question.User_id);
+        
 
         var lastInsertId = (int)adatpter.SelectCommand?.ExecuteScalar();
         _connection.Close();

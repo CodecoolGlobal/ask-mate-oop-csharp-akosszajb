@@ -26,7 +26,8 @@ namespace AskMate.Controllers
                 return Unauthorized("You must be logged in to accept an answer.");
             }
 
-            int userId = HttpContext.Session.GetInt32("UserId").GetValueOrDefault();
+            int userId = HttpContext.Session.GetInt32("userId").GetValueOrDefault();
+            
             var repository = new AnswerRepository(new NpgsqlConnection(_connectionString));
             try
             {
@@ -42,11 +43,13 @@ namespace AskMate.Controllers
             catch (NpgsqlException ex)
             {
                 Log.Error($"Database error: {ex.Message}");
-                return StatusCode(500, "A database error occurred while accepting the answer.");
+                throw new Exception($"SOMETHING WRONG HERE {ex}");
+                // return StatusCode(500, "A database error occurred while accepting the answer.");
             }
             catch (Exception ex)
             {
                 Log.Error($"An error occurred: {ex.Message}");
+                throw new Exception($"HUHUHUHUHU    {ex}");
                 return StatusCode(500, "An error occurred while accepting the answer.");
             }
         }

@@ -8,4 +8,5 @@ public class Answer
     public int Question_id { get; set; }
     public DateTime Submission_time { get; set; }
 
+    public int User_id { get; set; }
 }

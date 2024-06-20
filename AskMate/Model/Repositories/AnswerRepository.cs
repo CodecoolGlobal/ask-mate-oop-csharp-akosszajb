@@ -14,14 +14,27 @@ namespace AskMate.Model.Repositories
         
         public bool CanAcceptAnswer(int answerId, int userId)
         {
-            _connection.Open();
-            using (var command = new NpgsqlCommand("SELECT COUNT(1) FROM questions WHERE id = (SELECT question_id FROM answer WHERE id = @answerId) AND user_id = @userId", _connection))
+            if (_connection == null)
             {
-                command.Parameters.AddWithValue("@answerId", answerId);
-                command.Parameters.AddWithValue("@userId", userId);
-                bool canAccept = (long)command.ExecuteScalar() > 0;
+                throw new InvalidOperationException("Database connection is not initialized.");
+            }
+
+            _connection.Open();
+            try
+            {
+                using (var command = new NpgsqlCommand("SELECT COUNT(1) FROM questions WHERE id = (SELECT question_id FROM answer WHERE id = @answerId) AND questions.user_id = @userId", _connection))
+                {
+                    command.Parameters.AddWithValue("@answerId", answerId);
+                    command.Parameters.AddWithValue("@userId", userId);
+                    var result = command.ExecuteScalar();
+                    Console.WriteLine(result.GetType());
+                    bool canAccept = (long)result == 1;
+                    return canAccept;
+                }
+            }
+            finally
+            {
                 _connection.Close();
-                return canAccept;
             }
         }
 
@@ -70,11 +83,12 @@ namespace AskMate.Model.Repositories
             try
             {
                 using (var command = new NpgsqlCommand(
-                    "INSERT INTO answer (message, question_id, submission_time) VALUES (@message, @question_id, @submission_time) RETURNING id", _connection))
+                    "INSERT INTO answer (message, question_id, submission_time, user_id) VALUES (@message, @question_id, @submission_time, @user_id) RETURNING id", _connection))
                 {
                     command.Parameters.AddWithValue("@message", answer.Message);
                     command.Parameters.AddWithValue("@question_id", answer.Question_id);
                     command.Parameters.AddWithValue("@submission_time", answer.Submission_time);
+                    command.Parameters.AddWithValue("@user_id", answer.User_id);
 
                     var lastInsertId = (int)command.ExecuteScalar();
                     return lastInsertId;
