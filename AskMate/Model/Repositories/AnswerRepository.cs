@@ -11,6 +11,30 @@ namespace AskMate.Model.Repositories
         {
             _connection = connection;
         }
+        
+        public bool CanAcceptAnswer(int answerId, int userId)
+        {
+            _connection.Open();
+            using (var command = new NpgsqlCommand("SELECT COUNT(1) FROM questions WHERE id = (SELECT question_id FROM answer WHERE id = @answerId) AND user_id = @userId", _connection))
+            {
+                command.Parameters.AddWithValue("@answerId", answerId);
+                command.Parameters.AddWithValue("@userId", userId);
+                bool canAccept = (long)command.ExecuteScalar() > 0;
+                _connection.Close();
+                return canAccept;
+            }
+        }
+
+        public void AcceptAnswer(int answerId)
+        {
+            _connection.Open();
+            using (var command = new NpgsqlCommand("UPDATE answer SET is_accepted = TRUE WHERE id = @answerId", _connection))
+            {
+                command.Parameters.AddWithValue("@answerId", answerId);
+                command.ExecuteNonQuery();
+                _connection.Close();
+            }
+        }
 
         public bool QuestionExists(int questionId)
         {
